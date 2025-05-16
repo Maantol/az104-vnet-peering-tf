@@ -21,26 +21,68 @@ variable "vnet_name2" {
   default     = "matti-vnet2"
 }
 
-variable "vnet_peering1" {
-  description = "The name of the first network peering."
+variable "vnet_subnet1" {
+  description = "The name of the first virtual network subnet"
   type        = string
-  default     = "peer1to2"
+  default     = "subnet-1"
 }
 
-variable "vnet_peering2" {
-  description = "The name of the second network peering."
+variable "vnet_subnet2" {
+  description = "The name of the second virtual network subnet"
   type        = string
-  default     = "peer2to1"
+  default     = "subnet-2"
 }
 
 variable "vnet1_address_space" {
   description = "The address space of the first virtual network."
   type        = list(string)
-  default     = ["10.0.1.0/24"]
+  default     = ["10.0.0.0/16"]
 }
 
 variable "vnet2_address_space" {
   description = "The address space of the second virtual network."
   type        = list(string)
+  default     = ["10.1.0.0/16"]
+}
+
+variable "vnet1_subnet_address_prefix" {
+  description = "The subnet prefix address for first virtual network"
+  type        = list(string)
   default     = ["10.0.2.0/24"]
+}
+
+variable "vnet2_subnet_address_prefix" {
+  description = "The subnet prefix address for second virtual network"
+  type        = list(string)
+  default     = ["10.1.3.0/24"]
+}
+
+variable "vnet1_nic" {
+  description = "The name of virtual network network interface controller"
+  type        = string
+  default     = "matti-vnet1-nic"
+}
+
+variable "vnet2_nic" {
+  description = "The name of virtual network network interface controller"
+  type        = string
+  default     = "matti-vnet2-nic"
+}
+
+variable "vnet1_vm" {
+  description = "The name of vnet1 VM"
+  type        = string
+  default     = "matti-vnet1-vm"
+}
+
+variable "vnet2_vm" {
+  description = "The name of vnet2 VM"
+  type        = string
+  default     = "matti-vnet2-vm"
+}
+
+variable "vm_size" {
+  description = "The default VM size for West US2"
+  type        = string
+  default     = "Standard_B2ats_v2"
 }
