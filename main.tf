@@ -17,6 +17,57 @@ resource "azurerm_virtual_network" "vnet-2" {
   location            = var.azure_region
 }
 
+resource "azurerm_public_ip" "vnet-1_public_ip" {
+  name                = "matti-vnet-1-public-ip"
+  location            = var.azure_region
+  resource_group_name = azurerm_resource_group.vnet.name
+  allocation_method   = "Static"
+}
+
+resource "azurerm_public_ip" "vnet-2_public_ip" {
+  name                = "matti-vnet-2-public-ip"
+  location            = var.azure_region
+  resource_group_name = azurerm_resource_group.vnet.name
+  allocation_method   = "Static"
+}
+
+resource "azurerm_network_security_group" "vnet1-nsg" {
+  name                = "matti-vnet-1-nsg"
+  location            = var.azure_region
+  resource_group_name = azurerm_resource_group.vnet.name
+
+  security_rule {
+    name                       = "ssh"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+resource "azurerm_network_security_group" "vnet2-nsg" {
+  name                = "matti-vnet-2-nsg"
+  location            = var.azure_region
+  resource_group_name = azurerm_resource_group.vnet.name
+
+  security_rule {
+    name                       = "ssh"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+
 resource "azurerm_virtual_network_peering" "vnet-1" {
   name                      = "peer1to2"
   resource_group_name       = azurerm_resource_group.vnet.name
@@ -54,6 +105,7 @@ resource "azurerm_network_interface" "vnet-1-nic" {
     name                          = "matti-vnet1-ipconfig"
     subnet_id                     = azurerm_subnet.vnet-1.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.vnet-1_public_ip.id
   }
 }
 
@@ -66,7 +118,18 @@ resource "azurerm_network_interface" "vnet-2-nic" {
     name                          = "matti-vnet2-ipconfig"
     subnet_id                     = azurerm_subnet.vnet-2.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.vnet-2_public_ip.id
   }
+}
+
+resource "azurerm_network_interface_security_group_association" "vnet-1-nsg-association" {
+  network_interface_id      = azurerm_network_interface.vnet-1-nic.id
+  network_security_group_id = azurerm_network_security_group.vnet1-nsg.id
+}
+
+resource "azurerm_network_interface_security_group_association" "vnet-2-nsg-association" {
+  network_interface_id      = azurerm_network_interface.vnet-2-nic.id
+  network_security_group_id = azurerm_network_security_group.vnet2-nsg.id
 }
 
 resource "azurerm_virtual_machine" "vnet1-vm" {
